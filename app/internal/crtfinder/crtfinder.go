@@ -1,6 +1,13 @@
 package crtfinder
 
-import "github.com/norvd/crtchecker/internal/requester"
+import (
+	"encoding/json"
+	"errors"
+	"log"
+
+	"github.com/norvd/crtchecker/internal/data"
+	"github.com/norvd/crtchecker/internal/requester"
+)
 
 type CrtFinder struct {
 	cr *requester.CrtRequester
@@ -12,11 +19,20 @@ func New(url string) *CrtFinder {
 	}
 }
 
-func (cf *CrtFinder) Find(identity string) []byte {
+func (cf *CrtFinder) Find(identity string) ([]data.Entry, error) {
+	if identity == "" {
+		return nil, errors.New("invalid input value")
+	}
 	params := map[string]string{"q": identity}
 
 	result := cf.cr.GetWithParams(params)
 
-	return result
+	var certs []data.Entry
+	err := json.Unmarshal(result, &certs)
+	if err != nil {
+		log.Fatalf("failed to unmarshal response json: %v", err)
+	}
+
+	return certs, nil
 
 }
