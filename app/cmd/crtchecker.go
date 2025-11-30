@@ -1,7 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/norvd/crtchecker/internal/crtfinder"
+)
 
 func main() {
-	fmt.Println("Hello world!")
+	f := crtfinder.New("https://crt.sh")
+	result := f.Find("")
+	fmt.Println(string(result))
+
 }
